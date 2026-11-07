@@ -1,0 +1,10 @@
+{
+  "name": "toskill",
+  "version": "0.1.0",
+  "description": "Turn any repository into an agent skill: digest the docs, lint the SKILL.md, prepare the upstream PR.",
+  "author": { "name": "Ronald Nyami", "url": "https://github.com/provenwork" },
+  "homepage": "https://github.com/provenwork/toskill",
+  "repository": "https://github.com/provenwork/toskill",
+  "license": "MIT",
+  "keywords": ["agent-skills", "claude-code", "codex", "cursor"]
+}

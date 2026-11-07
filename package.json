@@ -1,0 +1,35 @@
+{
+  "name": "toskill",
+  "version": "0.1.0",
+  "description": "Turn any repository into an agent skill: digest the docs, lint the SKILL.md, prepare the upstream PR. Static, local, no dependencies.",
+  "bin": {
+    "toskill": "./cli.js"
+  },
+  "files": [
+    "cli.js",
+    "SKILL.md",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/provenwork/toskill.git"
+  },
+  "keywords": [
+    "agent-skills",
+    "skill",
+    "claude-code",
+    "codex",
+    "cursor",
+    "ai-agents",
+    "cli"
+  ],
+  "author": "Ronald Nyami (https://github.com/provenwork)",
+  "license": "MIT"
+}
