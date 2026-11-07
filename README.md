@@ -30,8 +30,8 @@ OK: "express" passes the format lint
 Linted against the official [anthropics/skills](https://github.com/anthropics/skills) repository (all 20 `SKILL.md` files, shallow clone of 2026-11-07): **9 of 20 pass as-is, 11 of 20 fail at least one check.** Most common failures: no copy-pasteable command (8 of 11), a description that never says when to use the skill (5 of 11), a description too short to route on (3 of 11). The official template fails too. The rules are deliberately stricter than the template: they check what an agent needs to route and act, not just the file shape. Reproduce it:
 
 ```bash
-git clone --depth 1 https://github.com/anthropics/skills
-for f in skills/skills/*/SKILL.md skills/template/SKILL.md; do npx toskill lint "$f"; done
+npx degit anthropics/skills anthropic-skills
+for f in anthropic-skills/skills/*/SKILL.md anthropic-skills/template/SKILL.md; do npx toskill lint "$f"; done
 ```
 
 ## The workflow it enforces
