@@ -131,6 +131,7 @@ Write the SKILL.md from the facts above — only commands that appear in the REA
 const PLACEHOLDER = /\b(TODO|FIXME|XXX|OWNER_LOGIN)\b|<[A-Z_]{3,}>/;
 
 function lint(text) {
+  text = text.replace(/^\uFEFF/, '').replace(/\r\n/g, '\n');  // tolerate BOM and Windows line endings
   const problems = [];
   const warn = [];
   const fm = text.match(/^---\n([\s\S]*?)\n---/);

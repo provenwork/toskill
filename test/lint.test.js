@@ -66,3 +66,9 @@ test('pr output includes disclosure, evidence slot and contributing warning', ()
   assert.match(out, /evidence/);
   assert.match(out, /CONTRIBUTING\.md/);
 });
+
+test('BOM and CRLF files are linted, not rejected as missing frontmatter', () => {
+  const crlf = '\uFEFF---\r\nname: fine-skill\r\ndescription: Checks CRLF tolerance of the linter. Use when linting files saved on Windows.\r\n---\r\n\r\n# Fine skill\r\n\r\n```bash\r\necho ok\r\n```\r\n';
+  const r = lint(crlf);
+  assert.deepEqual(r.problems, []);
+});
