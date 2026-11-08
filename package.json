@@ -1,18 +1,25 @@
 {
   "name": "toskill",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Turn any repository into an agent skill: digest the docs, lint the SKILL.md, prepare the upstream PR. Static, local, no dependencies.",
   "bin": {
     "toskill": "./cli.js"
   },
   "files": [
     "cli.js",
+    "frontmatter.js",
+    "digest.js",
+    "lint.js",
+    "pr.js",
     "SKILL.md",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "CHANGELOG.md",
+    "examples/demo-tool/"
   ],
   "scripts": {
-    "test": "node --test"
+    "test": "node --test",
+    "verify:pack": "node scripts/verify-pack.js"
   },
   "engines": {
     "node": ">=18"

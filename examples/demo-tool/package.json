@@ -1,0 +1,9 @@
+{
+  "name": "demo-tool",
+  "private": true,
+  "version": "1.0.0",
+  "bin": {
+    "demo-tool": "demo.js"
+  }
+}
+

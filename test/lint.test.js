@@ -27,7 +27,7 @@ test('a complete skill passes', () => {
 });
 
 test('missing frontmatter, placeholder, no code block and no when-clause all fail', () => {
-  const r = lint('# just a title\nTODO: write this for OWNER_LOGIN');
+  const r = lint('# just a title\nTODO: write this for OWNER_LOGIN', { strict: true });
   const text = r.problems.join(' | ');
   assert.match(text, /frontmatter/);
   assert.match(text, /placeholder/);
@@ -36,7 +36,7 @@ test('missing frontmatter, placeholder, no code block and no when-clause all fai
 });
 
 test('description must say when to use the skill', () => {
-  const r = lint(GOOD.replace(/description: .*/, 'description: A very nice tool that converts CSV files quickly.'));
+  const r = lint(GOOD.replace(/description: .*/, 'description: A very nice tool that converts CSV files quickly.'), { strict: true });
   assert.ok(r.problems.some(p => p.includes('WHEN')));
 });
 
@@ -61,7 +61,7 @@ test('local digest reads a real directory and flags existing skills', () => {
 
 test('pr output includes disclosure, evidence slot and contributing warning', () => {
   const out = prCommands('acme/widget', 'SKILL.md');
-  assert.match(out, /gh repo fork acme\/widget/);
+  assert.match(out, /gh repo fork 'acme\/widget'/);
   assert.match(out, /drafted with toskill/);
   assert.match(out, /evidence/);
   assert.match(out, /CONTRIBUTING\.md/);

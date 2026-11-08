@@ -1,65 +1,95 @@
 # toskill
 
-**Turn any repository into an agent skill.** README files were written for humans; agents need a `SKILL.md`, and most of the tools in the world don't have one. toskill digests a repo, helps your agent write the skill, lints it against objective rules, and prepares the upstream pull request.
+**Collect repository facts and review a SKILL.md before contributing it upstream.**
+
+Node 18+, no runtime dependencies. The CLI reads selected files; it never runs target code. It does not generate a skill, judge its usefulness, push a branch or open a PR.
 
 ```bash
-npx toskill digest vercel/next.js     # or any owner/repo, or a local path
-# your agent writes SKILL.md from the digest
+npx toskill digest github:expressjs/express
+# Write and test your SKILL.md from verified facts.
 npx toskill lint SKILL.md
-npx toskill pr vercel/next.js         # prints the exact gh commands + a disclosure PR body
+npx toskill lint SKILL.md --strict
+npx toskill pr expressjs/express SKILL.md
 ```
 
-No dependencies, Node 18+. **Static analysis only: toskill never executes the target repository's code.**
+## Install and remove
 
-## Sixty seconds
+Run with npx for a one-off invocation, or install a fixed version globally:
+
+```bash
+npm install --global toskill@0.1.2
+toskill version
+npm uninstall --global toskill
+```
+
+The version in this source tree is a local release candidate until the npm release succeeds. To use the checkout now, run `node cli.js` in place of `toskill`. No install or postinstall script runs in this package.
+
+Claude Code plugin:
 
 ```text
-$ npx toskill digest expressjs/express
-digest written: toskill-digest.md (142 files scanned)
-
-$ npx toskill lint SKILL.md
-FAIL: description never says WHEN to use the skill ("Use when …")
-FAIL: body has no fenced code block: give at least one copy-pasteable command
-
-$ npx toskill lint SKILL.md   # after the fix
-OK: "express" passes the format lint
-```
-
-## Measured
-
-Linted against the official [anthropics/skills](https://github.com/anthropics/skills) repository (all 20 `SKILL.md` files, shallow clone of 2026-11-07): **9 of 20 pass as-is, 11 of 20 fail at least one check.** Most common failures: no copy-pasteable command (8 of 11), a description that never says when to use the skill (5 of 11), a description too short to route on (3 of 11). The official template fails too. The rules are deliberately stricter than the template: they check what an agent needs to route and act, not just the file shape. Reproduce it:
-
-```bash
-npx degit anthropics/skills anthropic-skills
-for f in anthropic-skills/skills/*/SKILL.md anthropic-skills/template/SKILL.md; do npx toskill lint "$f"; done
-```
-
-## The workflow it enforces
-
-| Step | Who | What |
-|---|---|---|
-| `digest` | CLI | facts, manifests, docs, README — and a warning if a SKILL.md already exists |
-| write | your agent | a skill built **only** from facts in the digest, limits included |
-| `lint` | CLI | frontmatter, kebab-case name, a "use when" description, real commands, no placeholders |
-| test | you + agent | use the tool through the skill on 2–3 real tasks; keep the evidence |
-| `pr` | CLI | exact `gh` commands and a PR body that discloses the method and carries your evidence |
-
-In Claude Code, install it as a plugin and just ask: *"make a skill for owner/repo"*:
-
-```bash
 /plugin marketplace add provenwork/skills
 /plugin install toskill@provenwork
+/plugin uninstall toskill@provenwork
 ```
 
-## What it does not do
+Plugin and npm releases are separate channels; a local source change does not update an installed plugin.
 
-- It does not write the skill for you. The digest feeds your agent; quality comes from testing, not generation.
-- It does not open the PR itself. It prints the commands; a human reviews, runs them, and answers the maintainer.
-- It cannot judge usefulness. The lint checks format; only using the tool proves the skill works.
-- Respect maintainers: one tested PR is a contribution, twenty untested ones are spam. The PR body always discloses how the skill was made.
+## Offline demo from this checkout
 
-## Why
+The example is synthetic, includes its own command, and requires no network:
 
-Agents only use the tools they understand. The ecosystems that exploded in the last year (Claude Code, Codex, Cursor) run on `SKILL.md` files, and most repositories don't have one. Every missing skill is a tool that agents silently ignore — including yours.
+```bash
+node cli.js digest ./examples/demo-tool --output demo-digest.md
+node cli.js lint examples/demo-tool/SKILL.md --strict
+node examples/demo-tool/demo.js hello
+```
+
+The last command prints `HELLO`. The digest includes the README, package manifest and document excerpt, and warns that this fixture already has a skill. Re-running a digest refuses to overwrite the output; add `--force` deliberately to replace it.
+
+## Structural checks and editorial advice
+
+The [Agent Skills specification](https://agentskills.io/specification) requires a name and description in YAML frontmatter. Structural checks enforce nonempty strings, a name of at most 64 characters without consecutive/leading/trailing hyphens, a description of at most 1024 characters, and the matching parent folder when the input filename is SKILL.md.
+
+The dependency-free reader supports plain, single-quoted and JSON-compatible double-quoted scalar values, literal/folded block scalars (`|`, `|-`, `|+`, `>`, `>-`, `>+`), comments, and a two-space scalar metadata map. Duplicate fields, comment-only descriptions, malformed scalars and unsupported syntax fail explicitly. This is a bounded YAML subset, **not a full YAML parser or complete specification certification**. Advanced valid YAML may require another validator.
+
+Default lint failures concern these supported structural checks. Warnings suggest a trigger phrase, nonempty shell example, limits and removal of obvious placeholders. `--strict` also makes those editorial warnings fail. The 20-character description hint, English trigger patterns and shell-command allowlist are local policy, not requirements of the specification. A prose-only skill can be valid. A recognized command can still be unsafe or incorrect; no command is executed or validated by lint.
+
+The old 0.1.1 comparison against Anthropic's skills is withdrawn as a quality claim: its regex read block indicators as descriptions. Three “too short” diagnoses measured `>` or `|-`, rather than the actual text. No efficacy rate is claimed for 0.1.2.
+
+## Digest coverage and safety
+
+Existing local paths take priority: `digest owner/repo` reads that folder if it exists; `digest github:owner/repo` forces GitHub. A GitHub digest pins the tree and file reads to one commit SHA. Metadata such as stars is observed separately at collection time.
+
+The local inventory excludes .git, node_modules and __pycache__, skips symlinks, and is bounded to depth 20 and 4000 files. Inventory truncation and failed API/file reads appear as warnings; absence of a listed skill is not established when inventory is incomplete. Remote trees can also be truncated by GitHub.
+
+Only the README, supported root manifests and up to six selected Markdown/text documents are read. Each selected file is bounded to 65536 bytes; rendered excerpts are bounded to 20000 README characters, 8000 per manifest and 4000 per document. Other examples and documents are paths only. The digest prints exclusions and clipping. It is not a source-code audit. Source excerpts remain untrusted; the wrapper cannot prevent an agent from following hostile instructions.
+
+Remote mode makes HTTPS read requests to GitHub. If GITHUB_TOKEN is present it is used only for those requests; a public read token suffices. The target's code and installation scripts never run.
+
+## PR preparation
+
+`pr` prints commands only, using PowerShell on Windows and POSIX sh elsewhere. Select explicitly with `--shell powershell` or `--shell sh`. Paths resolve from the original working directory, are quoted for the chosen shell, and the clone directory must not already exist. Use the same operating system when running the printed plan.
+
+The plan checks the source, forks/clones, creates a branch and copies the skill. It stops before push/PR creation. Read CONTRIBUTING.md, inspect the diff, test on actual tasks, and write a disclosure with real evidence. The command supplies no evidence and makes no claim that tests happened.
+
+## Alternatives and limits
+
+- The [official template and skill-creator](https://github.com/anthropics/skills) suit an agent-led authoring/evaluation workflow. Toskill adds a small static digest and inspectable preparation commands; it does not replace evaluation.
+- [Repomix](https://github.com/yamadashy/repomix) collects broader repository context. Toskill deliberately collects a bounded document subset.
+- A manual README review plus a YAML parser may be enough for a single contribution. Toskill does not establish that its editorial rules improve routing or acceptance.
+
+## Local verification and release
+
+```bash
+npm test
+npm run verify:pack
+```
+
+The archive verifier packs once, checks an explicit file inventory and source hashes, installs that exact archive locally with scripts disabled and offline mode, then exercises its version, lint, digest and demo. It writes the tested tarball and SHA-256 manifest under .artifacts/.
+
+CI runs source tests across supported Node/platform combinations and checks the tarball. Release publication uses that tested tarball on a version-matching tag via npm OIDC. The maintainer must first configure the npm trusted publisher for provenwork/toskill, workflow `release.yml` and environment `npm-release`, allowing direct publish. Protect that environment and release tags. No npm token is embedded.
+
+The release runner uses Node 24 and npm 11.5.1 or later, independently of the user's Node 18 runtime floor. See [npm trusted publishing requirements](https://docs.npmjs.com/trusted-publishers/). This workflow is prepared locally; no release has been triggered by editing it.
 
 MIT.
+
