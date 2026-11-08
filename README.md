@@ -1,28 +1,28 @@
 # toskill
 
-**Collect repository facts and review a SKILL.md before contributing it upstream.**
+**Make any repository usable by AI coding agents, in one command.**
 
-Node 18+, no runtime dependencies. The CLI reads selected files; it never runs target code. It does not generate a skill, judge its usefulness, push a branch or open a PR.
+Agents use well only the tools they understand, and most repositories were written for humans. toskill reads a repository without ever running its code, hands your agent the facts it needs to write a `SKILL.md`, checks that skill against clear rules, and prepares the upstream pull request for you to review.
 
 ```bash
-npx toskill digest github:expressjs/express
-# Write and test your SKILL.md from verified facts.
-npx toskill lint SKILL.md
-npx toskill lint SKILL.md --strict
-npx toskill pr expressjs/express SKILL.md
+npx toskill digest github:expressjs/express   # the facts your agent writes the skill from
+npx toskill lint SKILL.md                      # each FAIL line says exactly what to fix
+npx toskill pr expressjs/express SKILL.md      # prints the commands; you review and push
 ```
+
+Node 18+, no runtime dependencies. One tested skill is a contribution; twenty generated ones are spam. toskill keeps a human on every step.
 
 ## Install and remove
 
 Run with npx for a one-off invocation, or install a fixed version globally:
 
 ```bash
-npm install --global toskill@0.1.2
+npm install --global toskill@0.1.3
 toskill version
 npm uninstall --global toskill
 ```
 
-The version in this source tree is a local release candidate until the npm release succeeds. To use the checkout now, run `node cli.js` in place of `toskill`. No install or postinstall script runs in this package.
+To run from a checkout, use `node cli.js` in place of `toskill`. No install or postinstall script runs in this package.
 
 Claude Code plugin:
 
@@ -74,6 +74,7 @@ The plan checks the source, forks/clones, creates a branch and copies the skill.
 
 ## Alternatives and limits
 
+- toskill does not write the skill for you, judge its usefulness, push a branch or open a PR.
 - The [official template and skill-creator](https://github.com/anthropics/skills) suit an agent-led authoring/evaluation workflow. Toskill adds a small static digest and inspectable preparation commands; it does not replace evaluation.
 - [Repomix](https://github.com/yamadashy/repomix) collects broader repository context. Toskill deliberately collects a bounded document subset.
 - A manual README review plus a YAML parser may be enough for a single contribution. Toskill does not establish that its editorial rules improve routing or acceptance.
@@ -89,7 +90,7 @@ The archive verifier packs once, checks an explicit file inventory and source ha
 
 CI runs source tests across supported Node/platform combinations and checks the tarball. The release workflow stages by default. Publication requires its explicit publish input and uses that tested tarball on a version-matching tag via npm OIDC. The maintainer must first configure the npm trusted publisher for provenwork/toskill, workflow `release.yml` and environment `release`, allowing direct publish. Protect that environment and release tags. No npm token is embedded.
 
-The release runner uses Node 24 and npm 11.5.1 or later, independently of the user's Node 18 runtime floor. See [npm trusted publishing requirements](https://docs.npmjs.com/trusted-publishers/). This workflow is prepared locally; no release has been triggered by editing it.
+The release runner uses Node 24 and npm 11.5.1 or later, independently of the user's Node 18 runtime floor. See [npm trusted publishing requirements](https://docs.npmjs.com/trusted-publishers/). Versions 0.1.2 and 0.1.3 were published to npm manually on 2026-11-08; this workflow is prepared but its trusted publisher is not yet configured.
 
 MIT.
 

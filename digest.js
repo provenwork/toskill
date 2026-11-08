@@ -8,7 +8,7 @@ const MANIFESTS = ['package.json', 'pyproject.toml', 'Cargo.toml', 'go.mod', 'se
 const isSlug = s => /^[A-Za-z0-9][A-Za-z0-9_-]*\/[A-Za-z0-9][A-Za-z0-9_.-]*$/.test(s || '');
 function gh(url) {
   return new Promise((resolve, reject) => {
-    const headers = { 'User-Agent': 'toskill/0.1.2', Accept: 'application/vnd.github+json' };
+    const headers = { 'User-Agent': 'toskill/0.1.3', Accept: 'application/vnd.github+json' };
     if (process.env.GITHUB_TOKEN) headers.Authorization = 'Bearer ' + process.env.GITHUB_TOKEN;
     const request = https.get(url, { headers }, res => {
       let body = '', bytes = 0;

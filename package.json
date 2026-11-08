@@ -1,6 +1,6 @@
 {
   "name": "toskill",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Turn any repository into an agent skill: digest the docs, lint the SKILL.md, prepare the upstream PR. Static, local, no dependencies.",
   "bin": {
     "toskill": "./cli.js"

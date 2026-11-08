@@ -1,6 +1,10 @@
 # Changelog
 
-## 0.1.2 — 2026-11-08 (local release candidate)
+## 0.1.3 — 2026-11-08
+
+- README: lead with what the tool does for the user; remove notices that described 0.1.2 as unpublished. No code change.
+
+## 0.1.2 — 2026-11-08
 
 - Decode supported multiline YAML descriptions before checking content and length; reject duplicate, null, malformed and unsupported scalar syntax explicitly.
 - Separate structural failures from advisory editorial heuristics; strict mode opts into the latter. Withdraw the 0.1.1 corpus quality interpretation.

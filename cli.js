@@ -2,7 +2,7 @@
 'use strict';
 const fs = require('fs'), path = require('path');
 const digest = require('./digest.js'), linting = require('./lint.js'), pr = require('./pr.js');
-const VERSION = '0.1.2';
+const VERSION = '0.1.3';
 function options(args) {
   const result = { positional: [] };
   for (let i = 0; i < args.length; i++) {
