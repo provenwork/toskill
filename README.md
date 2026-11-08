@@ -87,7 +87,7 @@ npm run verify:pack
 
 The archive verifier packs once, checks an explicit file inventory and source hashes, installs that exact archive locally with scripts disabled and offline mode, then exercises its version, lint, digest and demo. It writes the tested tarball and SHA-256 manifest under .artifacts/.
 
-CI runs source tests across supported Node/platform combinations and checks the tarball. Release publication uses that tested tarball on a version-matching tag via npm OIDC. The maintainer must first configure the npm trusted publisher for provenwork/toskill, workflow `release.yml` and environment `npm-release`, allowing direct publish. Protect that environment and release tags. No npm token is embedded.
+CI runs source tests across supported Node/platform combinations and checks the tarball. The release workflow stages by default. Publication requires its explicit publish input and uses that tested tarball on a version-matching tag via npm OIDC. The maintainer must first configure the npm trusted publisher for provenwork/toskill, workflow `release.yml` and environment `release`, allowing direct publish. Protect that environment and release tags. No npm token is embedded.
 
 The release runner uses Node 24 and npm 11.5.1 or later, independently of the user's Node 18 runtime floor. See [npm trusted publishing requirements](https://docs.npmjs.com/trusted-publishers/). This workflow is prepared locally; no release has been triggered by editing it.
 

@@ -51,7 +51,11 @@ function verifyArchive(archive) {
     const pr = run(process.execPath, [cli, 'pr', 'acme/widget', path.join(example, 'SKILL.md')], { cwd: work });
     if (!pr.includes('Evidence: not supplied') || pr.includes('cp SKILL.md SKILL.md')) throw new Error('installed PR smoke failed');
     return { files: files.map(p => ({ path: p, sha256: hash(path.join(root, p)) })), installedSmoke: ['version', 'strict lint', 'digest docs/coverage', 'offline demo', 'PR print only'] };
-  } finally { fs.rmSync(work, { recursive: true, force: true }); }
+  } finally {
+    const resolved = path.resolve(work), tempRoot = path.resolve(os.tmpdir()) + path.sep;
+    if (!resolved.startsWith(tempRoot) || !path.basename(resolved).startsWith('toskill-pack-')) throw new Error('refusing cleanup outside allocated temp directory');
+    fs.rmSync(resolved, { recursive: true, force: true });
+  }
 }
 function main() {
   const external = process.argv[2];
